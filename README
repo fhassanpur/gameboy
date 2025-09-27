@@ -1,0 +1,9 @@
+A basic gameboy emulator created in C with SDL3.
+
+# How to build
+
+```
+cmake -S . -B build
+cmake --build build
+./build/gameboy <rom_filename>
+```
