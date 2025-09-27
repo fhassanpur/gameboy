@@ -1,3 +1,5 @@
+#pragma once
+
 #include <SDL3/SDL.h>
 
 #define WINDOW_TITLE "Gameboy Emulator"
