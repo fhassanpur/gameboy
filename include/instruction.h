@@ -98,6 +98,15 @@ typedef struct instruction {
     uint8_t opcode;
     instruction_type_t type;
     char *mnemonic;
-    uint8_t *byte_operand;
-    uint16_t *word_operand;
+    uint8_t cycles;
+
+    // Registers
+    uint8_t *byte_register_r1;
+    uint8_t *byte_register_r2;
+    uint16_t *word_register_r1;
+    uint16_t *word_register_r2;
+
+    // Operands
+    uint8_t byte_operand;
+    uint16_t word_operand;
 } instruction_t;

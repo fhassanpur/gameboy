@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #include "instruction.h"
 
@@ -48,11 +49,15 @@ typedef struct cpu_registers {
     uint8_t ime; // Interrupt Master Enable
 } cpu_registers_t;
 
+typedef struct cpu_clock {
+	uint64_t machine_cycles;
+} cpu_clock_t;
+
 typedef struct cpu_state {
     cpu_registers_t registers;
+	cpu_clock_t clock;
 } cpu_state_t;
 
 void cpu_init(cpu_state_t *cpu);
 bool cpu_step(cpu_state_t *cpu, uint8_t *rom_memory);
-instruction_t cpu_decode_instruction(cpu_state_t *cpu, uint8_t opcode);
 bool cpu_execute_instruction(cpu_state_t *cpu, instruction_t instruction);

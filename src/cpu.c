@@ -1,6 +1,8 @@
 #include <SDL3/SDL.h>
 
 #include "cpu.h"
+#include "decode.h"
+#include "ops.h"
 
 void cpu_init(cpu_state_t *cpu) {
     cpu->registers.af = 0x01B0;
@@ -16,31 +18,10 @@ bool cpu_step(cpu_state_t *cpu, uint8_t *rom_memory) {
     uint8_t opcode = rom_memory[cpu->registers.pc++];
 
     // Decode
-    instruction_t instruction = cpu_decode_instruction(cpu, opcode);
+    instruction_t instruction = cpu_decode_instruction(cpu, rom_memory, opcode);
 
     // Execute
     return cpu_execute_instruction(cpu, instruction);
-}
-
-instruction_t cpu_decode_instruction(cpu_state_t *cpu, uint8_t opcode) {
-    instruction_t instruction = {0};
-    instruction.opcode = opcode;
-    instruction.byte_operand = NULL;
-    instruction.word_operand = NULL;
-
-    switch (opcode) {
-        case 0x00:
-            instruction.type = NOP;
-            instruction.mnemonic = "NOP";
-            break;
-        // Add more opcodes here
-        default:
-            instruction.type = UNIMPLEMENTED;
-            instruction.mnemonic = "UNIMPLEMENTED INSTRUCTION";
-            break;
-    }
-
-    return instruction;
 }
 
 bool cpu_execute_instruction(cpu_state_t *cpu, instruction_t instruction) {
@@ -48,15 +29,30 @@ bool cpu_execute_instruction(cpu_state_t *cpu, instruction_t instruction) {
         case UNIMPLEMENTED:
             SDL_Log("Attempted to execute unimplemented instruction with opcode: %02X", instruction.opcode);
             return false;
+        case LD_nn_n:
+            cpu_op_ld_nn_n(cpu, instruction);
+            break;
+        case LD_n_nn:
+            cpu_op_ld_n_nn(cpu, instruction);
+            break;
+        case XOR_n:
+            cpu_op_xor_n(cpu, instruction);
+            break;
         case NOP:
             // Do nothing
             break;
+        case JP_nn:
+            cpu->registers.pc = instruction.word_operand;
+            break;
+
         // Handle other instructions here
         default:
             SDL_Log("Unhandled instruction type: %d", instruction.type);
             return false;
     }
     SDL_Log("%02X: %s", instruction.opcode, instruction.mnemonic);
+
+    cpu->clock.machine_cycles += instruction.cycles;
 
     return true;
 }
