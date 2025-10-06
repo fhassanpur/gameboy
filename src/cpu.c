@@ -2,7 +2,6 @@
 
 #include "cpu.h"
 #include "decode.h"
-#include "ops.h"
 
 void cpu_init(cpu_state_t *cpu) {
     cpu->registers.af = 0x01B0;
@@ -13,18 +12,18 @@ void cpu_init(cpu_state_t *cpu) {
     cpu->registers.pc = 0x0100;
 }
 
-bool cpu_step(cpu_state_t *cpu, uint8_t *rom_memory) {
+bool cpu_step(cpu_state_t *cpu, mmu_state_t *mmu) {
     // Fetch
-    uint8_t opcode = rom_memory[cpu->registers.pc++];
+    uint8_t opcode = mmu->rom[cpu->registers.pc++];
 
     // Decode
-    instruction_t instruction = cpu_decode_instruction(cpu, rom_memory, opcode);
+    instruction_t instruction = cpu_decode_instruction(cpu, mmu, opcode);
 
     // Execute
-    return cpu_execute_instruction(cpu, instruction);
+    return cpu_execute_instruction(cpu, mmu, instruction);
 }
 
-bool cpu_execute_instruction(cpu_state_t *cpu, instruction_t instruction) {
+bool cpu_execute_instruction(cpu_state_t *cpu, mmu_state_t *mmu, instruction_t instruction) {
     switch (instruction.type) {
         case UNIMPLEMENTED:
             SDL_Log("Attempted to execute unimplemented instruction with opcode: %02X", instruction.opcode);
@@ -35,14 +34,23 @@ bool cpu_execute_instruction(cpu_state_t *cpu, instruction_t instruction) {
         case LD_n_nn:
             cpu_op_ld_n_nn(cpu, instruction);
             break;
+        case LDD_HL_A:
+            cpu_op_ldd_hl_a(cpu, instruction);
+            break;
         case XOR_n:
             cpu_op_xor_n(cpu, instruction);
+            break;
+        case DEC_n:
+            cpu_op_dec_n(cpu, instruction);
             break;
         case NOP:
             // Do nothing
             break;
         case JP_nn:
             cpu->registers.pc = instruction.word_operand;
+            break;
+        case JR_cc_n:
+            cpu_op_jr_cc_n(cpu, instruction);
             break;
 
         // Handle other instructions here

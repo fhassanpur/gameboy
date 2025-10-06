@@ -4,6 +4,7 @@
 #include <stdbool.h>
 
 #include "instruction.h"
+#include "mmu.h"
 
 typedef struct cpu_registers {
     struct {
@@ -59,5 +60,5 @@ typedef struct cpu_state {
 } cpu_state_t;
 
 void cpu_init(cpu_state_t *cpu);
-bool cpu_step(cpu_state_t *cpu, uint8_t *rom_memory);
-bool cpu_execute_instruction(cpu_state_t *cpu, instruction_t instruction);
+bool cpu_step(cpu_state_t *cpu, mmu_state_t *mmu);
+bool cpu_execute_instruction(cpu_state_t *cpu, mmu_state_t *mmu, instruction_t instruction);

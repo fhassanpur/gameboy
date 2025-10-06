@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <SDL3/SDL.h>
 
-#define MAX_ROM_SIZE 32768
+#define MAX_ROM_SIZE 4194304 // 4MB
 
 bool load_rom(uint8_t *result, char const *filename) {
     // Open the file

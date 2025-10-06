@@ -3,6 +3,8 @@
 #include "window.h"
 #include "rom.h"
 #include "cpu.h"
+#include "mmu.h"
+#include "decode.h"
 
 int main(int argc, char *argv[]) {
     if (!initialize()) {
@@ -18,11 +20,13 @@ int main(int argc, char *argv[]) {
     bool running = true;
     SDL_Event event;
 
-    uint8_t rom_data[32768];
-    load_rom(rom_data, argv[1]);
+    uint8_t cartridge_data[MAX_ROM_SIZE];
+    load_rom(cartridge_data, argv[1]);
 
     cpu_state_t cpu = {0};
+    mmu_state_t mmu = {0};
     cpu_init(&cpu);
+    mmu_init(&mmu, cartridge_data);
     
     while (running) {
         // Check if program should quit
@@ -31,7 +35,7 @@ int main(int argc, char *argv[]) {
             running = false;
         }
 
-        if (!cpu_step(&cpu, rom_data)) {
+        if (!cpu_step(&cpu, &mmu)) {
             running = false;
         }
     }
