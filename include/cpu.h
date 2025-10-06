@@ -47,11 +47,14 @@ typedef struct cpu_registers {
 	uint16_t sp; // Stack Pointer
 	uint16_t pc; // Program Counter
 
-    uint8_t ime; // Interrupt Master Enable
+    bool ime; // Interrupt Master Enable
 } cpu_registers_t;
 
 typedef struct cpu_clock {
 	uint64_t machine_cycles;
+	
+	uint8_t disable_ime_timer; // Used to delay disabling IME by one instruction
+	uint8_t enable_ime_timer;  // Used to delay enabling IME by one instruction
 } cpu_clock_t;
 
 typedef struct cpu_state {

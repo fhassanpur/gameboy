@@ -310,7 +310,12 @@ instruction_t cpu_decode_instruction(cpu_state_t *cpu, mmu_state_t *mmu, uint8_t
             break;
 
         // LD A, n
-        // TODO
+        case 0x3E:
+            instruction.type = LD_A_n;
+            instruction.mnemonic = "LD A, n";
+            instruction.cycles = 8;
+            instruction.byte_operand = cpu_read_byte(cpu, mmu);
+            break;
 
         // LD n, A
         // TODO
@@ -333,6 +338,26 @@ instruction_t cpu_decode_instruction(cpu_state_t *cpu, mmu_state_t *mmu, uint8_t
             instruction.byte_register_r2 = &cpu->registers.a;
             break;
 
+        // LDI A, HL
+
+        // LDI HL, A
+
+        // LDH n, A
+        case 0xE0:
+            instruction.type = LDH_n_A;
+            instruction.mnemonic = "LDH (n), A";
+            instruction.cycles = 12;
+            instruction.byte_operand = cpu_read_byte(cpu, mmu);
+            break;
+
+        // LDH A, n
+        case 0xF0:
+            instruction.type = LDH_A_n;
+            instruction.mnemonic = "LDH A, (n)";
+            instruction.cycles = 12;
+            instruction.byte_operand = cpu_read_byte(cpu, mmu);
+            break;
+
         /**
          * 16-bit loads
          */
@@ -350,6 +375,12 @@ instruction_t cpu_decode_instruction(cpu_state_t *cpu, mmu_state_t *mmu, uint8_t
             break;
         
         // CP n
+        case 0xFE:
+            instruction.type = CP_n;
+            instruction.mnemonic = "CP n";
+            instruction.cycles = 8;
+            instruction.byte_operand = cpu_read_byte(cpu, mmu);
+            break;
 
         // INC n
         
@@ -363,6 +394,10 @@ instruction_t cpu_decode_instruction(cpu_state_t *cpu, mmu_state_t *mmu, uint8_t
             instruction.byte_register_r1 = &cpu->registers.b;
             break;
         case 0x0D:
+            instruction.type = DEC_n;
+            instruction.mnemonic = "DEC C";
+            instruction.cycles = 4;
+            instruction.byte_register_r1 = &cpu->registers.c;
             break;
         case 0x15:
             break;
@@ -382,6 +417,16 @@ instruction_t cpu_decode_instruction(cpu_state_t *cpu, mmu_state_t *mmu, uint8_t
         /**
          * Miscellaneous
          */
+        case 0xF3:
+            instruction.type = DI;
+            instruction.mnemonic = "DI";
+            instruction.cycles = 4;
+            break;
+        case 0xFB:
+            instruction.type = EI;
+            instruction.mnemonic = "EI";
+            instruction.cycles = 4;
+            break;
 
         /**
          * Rotates & Shifts
